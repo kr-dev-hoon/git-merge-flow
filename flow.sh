@@ -2,6 +2,7 @@
 
 # 체크아웃할 브랜치 이름
 BRANCH="release-release"
+echo "test"
 
 # 1. 현재 브랜치를 release로 체크아웃
 git checkout $BRANCH
