@@ -1,14 +1,21 @@
 #!/bin/bash
 
-# git 명령어 실행 후 결과를 변수에 저장
-output=$(git status)
+# 체크아웃할 브랜치 이름
+BRANCH="release-release"
 
-# 결과를 파싱
-if [[ $output == *"Changes not staged for commit"* ]]; then
-  echo "변경사항이 스테이지에 추가되지 않았습니다."
-  echo "teststset"
-elif [[ $output == *"Changes to be committed"* ]]; then
-  echo "변경사항이 스테이지에 추가되었습니다."
-else
-  echo "변경사항이 없습니다."
-fi
+# 1. 현재 브랜치를 release로 체크아웃
+git checkout $BRANCH
+
+# 2. origin release repository pull
+git pull origin release-release
+
+# 3. 해당 브랜치를 기반으로 master 브랜치에 머지
+git checkout master
+git merge --no-ff $BRANCH
+
+# 4. 머지가 완료되면 master브랜치로 체크아웃
+git checkout master
+
+# 5. local, origin에 있는 release 브랜치 삭제
+git branch -D $BRANCH
+git push origin --delete $BRANCH
