@@ -6,6 +6,7 @@ output=$(git status)
 # 결과를 파싱
 if [[ $output == *"Changes not staged for commit"* ]]; then
   echo "변경사항이 스테이지에 추가되지 않았습니다."
+  echo "teststset"
 elif [[ $output == *"Changes to be committed"* ]]; then
   echo "변경사항이 스테이지에 추가되었습니다."
 else
