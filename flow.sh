@@ -2,6 +2,11 @@
 
 BRANCH="release-release"
 
+echo test
+echo test
+echo test
+echo test
+
 new_branches=(
   qa
   test
