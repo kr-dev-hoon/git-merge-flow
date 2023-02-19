@@ -1,21 +1,62 @@
 #!/bin/bash
 
-# 체크아웃할 브랜치 이름
 BRANCH="release-release"
 
-# 1. 현재 브랜치를 release로 체크아웃
+new_branches=(
+  qa
+  test
+  release-release
+)
+
+managed_braches=(
+  master
+  dev
+  test
+  qa
+  release-release
+)
+
+DATE=$(date +%Y.%m.%d)
+
 git checkout $BRANCH
 
-# 2. origin release repository pull
-git pull origin release-release
+git pull origin $BRANCH
 
-# 3. 해당 브랜치를 기반으로 master 브랜치에 머지
+tempfile=$(mktemp)
+
+echo "#Enter Commit Feature Message ( ex. - feature (BE-XXXX) : ... )" >"$tempfile"
+
+vim "$tempfile"
+commit_message=$(grep -v '^#' "$tempfile")
+
+echo "$commit_message" >"$tempfile"
+rm -f "$tempfile"
+
+master_msg="Merge branch '$BRANCH'
+
+$commit_message"
+
 git checkout master
-git merge --no-ff $BRANCH
 
-# 4. 머지가 완료되면 master브랜치로 체크아웃
-git checkout master
+git merge --no-ff $BRANCH -m "$master_msg"
 
-# 5. local, origin에 있는 release 브랜치 삭제
-git branch -D $BRANCH
-git push origin --delete $BRANCH
+git checkout dev
+
+dev_msg="feature (배포) $DATE
+
+$commit_message"
+
+git merge --no-ff master -m "$dev_msg"
+
+for new_branch in "${new_branches[@]}"; do
+  git branch -D "$new_branch"
+  git branch "$new_branch" dev
+done
+
+for push_branch in "${managed_braches[@]}"; do
+  git push -u -f origin "$push_branch"
+done
+
+git push -f origin "$push_branch"
+
+echo "Success"
